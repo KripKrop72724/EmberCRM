@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "dal_select2",
     "admin_menu",
     "grappelli",
+    "mptt",
     # default entries
     'django.contrib.admin',
     'django.contrib.auth',
