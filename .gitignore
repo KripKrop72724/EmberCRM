@@ -149,3 +149,4 @@ test.json
 */migrations/*
 !**/migrations
 !**/migrations/_init_.py
+/EmberCRM/settings_db.py
