@@ -1,0 +1,1506 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/ebos22.css" %}">
+{% endblock %}
+
+{% load static i18n custom_admin_menu custom_admin_logo custom_admin_css %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block blockbots %}
+    {{ block.super }}
+    <style type="text/css">
+        {% get_custom_admin_css as css %}
+        {{ css }}
+    </style>
+{% endblock %}
+
+{% block nav-global %}
+
+    {% comment %} {%if request.user.is_superuser %} {% endcomment %}
+    {% get_admin_menu as menu %}
+
+    {% if menu %}
+    </div>
+
+    <div id="admin_menu_container">
+        <div class="tabs">
+            <ul>
+                {% for title, item in menu.items %}
+                {% if item.title == "Dashboard" %}
+                <li class="{% if item.active %}active{% endif %}{% if item.children|length > 1 %} has-child{% endif %}">
+                    <a href="{{ item.url }}">{{ item.title }} {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+
+                    {% if item.children|length > 1 %}
+                    <ul>
+                        {% for sub in item.children %}
+                            <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+                {% if item.title == "M01-Foundation" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Company Setup&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                            <li class="smenu"><a>Masters &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                            {% for sub in item.children %}
+                                {% if sub.title == "A1.Company Masters" or sub.title == "A2.Divisions" or sub.title == "A3.Departments" or sub.title == "A4.Warehouse Masters" or sub.title == "A5.Project Masters" or sub.title == "A6.Sales Persons" or sub.title == "A8.Category Masters" or sub.title == "A7.Nationality Masters" or sub.title == "A9.Languages" %}
+                                <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                             </ul>
+                            </li>
+                            <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                                <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "E1.Configurations" or sub.title == "E2.Setup Auto emails" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                 </ul>
+                            </li>
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endif %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Insurance Service &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Motor Insurance &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                        <ul class="tlist">
+                        {% for sub in item.children %}
+                            {% if sub.title == "Upload to extract datas" or sub.title == "Extracted Policy Datas" or sub.title == "Extracted EID Datas" or sub.title == "Extracted RTA Vehicle Datas" or sub.title == "Extracted Driving License Datas" %}
+                            <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                   </li>
+                    </ul>
+                    {% endif %}
+                </li>
+                {% if item.title == "M10-Finance" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Finance &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "C1.Voucher Controls" or sub.title == "C2.Voucher Setups" or sub.title == "C3.GL Codes" or sub.title == "C4.Cashflow Setups" or sub.title == "C5.Activity Setups" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Posting Controls" or sub.title == "A2.Tax Setups" or sub.title == "A4.Finance Admins" or sub.title == "A5.Cheque Controls" %}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Masters &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "B1.Chart of Accounts" or sub.title == "B2.SubLedger Masters" or sub.title == "B3.SubLedger Types" or sub.title == "B4.Company Bank Accounts" or sub.title == "B5.Currency Masters" or sub.title == "B6.Currency Rates" %}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A3.Work Orders"%}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Vouchers &nbsp;&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.GL Vouchers"  or sub.title == "B3.GL Allocations"  or sub.title == "P4.Bank Payment Vouchers" or sub.title == "P5.Cash Payment Vouchers" or sub.title == "P6.PDC Payable Reviews" or  sub.title == "P8.Payment Allocations" or sub.title == "P9.Prepayment Schedules"  %} <!--or sub.title == "P7.Allocate and Pay"-->
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in item.children %}
+                                    {% if sub.title == "R5.Bank Receipt Vouchers" or sub.title == "R6.Cash Receipt Vouchers" or sub.title == "R7.PDC Recievable Reviews" or sub.title == "R9.Receipt Allocations" %} <!--sub.title == "R8.Allocate and Receive" or -->
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Invoices &nbsp;&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if  sub.title == "P1.Payable Invoices" or sub.title == "P3.Credit Notes" or sub.title == "R1.Receivable Invoices" or sub.title == "R3.Recurring Invoices" or  sub.title == "R4.Debit Notes" or  sub.title == "R2.Tax Invoice Receivables" or sub.title == "P2.Tax Invoice Payables" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Reports &nbsp;&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "D6.Subledger Balance asof Dates" or sub.title == "D7.Subledger Balance btw Dates" or sub.title == "D5.Control A/C Balance by Subledgers" or sub.title == "D8.Day Books" or sub.title == "D4.Statement of Account Details" or sub.title == "D3.Statement of Account Outstandings" or sub.title == "D2.GL Stmt Contra Balances" or sub.title == "D1.GL Stmt Running Balances" or sub.title == "D9.Aging Reports" or sub.title == "D51.Control A/C Balance by COAs" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Fixed Assets &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "T1.Asset Masters" or sub.title == "T4.Asset Transactions" or sub.title == "T2.Asset Depreciations" or sub.title == "T3.Asset Services" or sub.title == "T5.Fixed Asset Postings" or sub.title == "T6.View Asset Historys" or sub.title == "T7.Asset Valuations" or sub.title == "T8.Disposed Assets" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Controls &nbsp;&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Account Balances" or sub.title == "C2.Subledger Balances" or sub.title == "C3.Unposted GL reviews" or sub.title == "C4.Financial Year closings"  or sub.title == "B2.Tax Filings" or  sub.title == "B4.Manual Bank Reconciliations" or  sub.title == "B5.Auto Bank Reconciliations" or sub.title == "B5.Inter Company Transactions"%}
+
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Financial Statements &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "E2.Trial Balances" or sub.title == "E3.Balance Sheets" or sub.title == "E4.Profit or Loss Statements" or sub.title == "E1.Trial Balance Check Lists" or sub.title == "E5.Consolidated Trial Balances" or sub.title == "E6.Cash Flow Statements" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endif %}
+
+                {% if item.title == "M10-Finance" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Finance2 &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Accounts Masters &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                            {% for sub in menu|lookup:"M01-Foundation" %}
+                                {% if sub.title == "B1.Chart of Accounts" or sub.title == "B2.SubLedger Masters" or sub.title == "B3.SubLedger Types" or sub.title == "B4.Company Bank Accounts" or sub.title == "B5.Currency Masters" or sub.title == "B6.Currency Rates" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Accounts Control &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                            {% for sub in menu|lookup:"M01-Foundation" %}
+                                {% if sub.title == "C1.Voucher Controls" or sub.title == "C2.Voucher Setups" or sub.title == "C3.GL Codes" or sub.title == "C4.Cashflow Setups" or sub.title == "C5.Activity Setups" %}
+                                <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nmenu"><a>General Ledger &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="nlist">
+                                <li class="smenu"><a>GL Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                                    <ul class="tlist">
+                                        {% for sub in item.children %}
+                                            {% if sub.title == "A1.Posting Controls" or sub.title == "A2.Tax Setups" or sub.title == "A3.Work Orders" or sub.title == "A4.Finance Admins" or sub.title == "A5.Cheque Controls" %}
+                                            <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                <li class="smenu"><a>GL Transactions &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                                    <ul class="tlist">
+                                        {% for sub in item.children %}
+                                            {% if sub.title == "B1.GL Vouchers" or  sub.title == "B4.Manual Bank Reconciliations" or  sub.title == "B5.Auto Bank Reconciliations" or sub.title == "B2.Tax Filings" or sub.title == "B3.GL Allocations" or sub.title == "B5.Inter Company Transactions" %}
+                                            <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                <li class="smenu"><a>GL Controls &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                                    <ul class="tlist">
+                                        {% for sub in item.children %}
+                                            {% if sub.title == "C1.Account Balances" or sub.title == "C2.Subledger Balances" or sub.title == "C3.Unposted GL reviews" or sub.title == "C4.Financial Year closings" %}
+                                            <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                <li class="smenu"><a>GL Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                                    <ul class="tlist">
+                                        {% for sub in item.children %}
+                                            {% if sub.title == "D6.Subledger Balance asof Dates" or sub.title == "D7.Subledger Balance btw Dates" or sub.title == "D5.Control Account Balances" or sub.title == "D8.Day Books" or sub.title == "D4.Statement of Account Details" or sub.title == "D3.Statement of Account Outstandings" or sub.title == "D2.GL Stmt Contra Balances" or sub.title == "D1.GL Stmt Running Balances" or sub.title == "D9.Aging Reports" %}
+                                            <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Account payable &nbsp;&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "P7.Allocate and Pay" or sub.title == "P4.Bank Payment Vouchers" or sub.title == "P5.Cash Payment Vouchers" or sub.title == "P6.PDC Payable Reviews" or sub.title == "P1.Payable Invoices" or sub.title == "P8.Payment Allocations" or sub.title == "P9.Prepayment Schedules" or sub.title == "P2.Tax Invoice Payables" or sub.title == "P3.Credit Notes"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Account receivable &nbsp;&nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "R1.Receivable Invoices" or sub.title == "R3.Recurring Invoices" or sub.title == "R8.Allocate and Receive" or sub.title == "R5.Bank Receipt Vouchers" or sub.title == "R6.Cash Receipt Vouchers" or sub.title == "R7.PDC Recievable Reviews" or sub.title == "R9.Receipt Allocations" or sub.title == "R4.Debit Notes" or sub.title == "R2.Tax Invoice Receivables"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Fixed asset &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "T1.Asset Masters" or sub.title == "T4.Asset Transactions" or sub.title == "T2.Asset Depreciations" or sub.title == "T3.Asset Services" or sub.title == "T5.Fixed Asset Postings" or sub.title == "T6.View Asset Historys" or sub.title == "T7.Asset Valuations" or sub.title == "T8.Disposed Assets" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Financial Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "E2.Trial Balances" or sub.title == "E3.Balance Sheets" or sub.title == "E4.Profit or Loss Statements" or sub.title == "E1.Trial Balance Check Lists" or sub.title == "E5.Consolidated Trial Balances" or sub.title == "E6.Cash Flow Statements" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endif %}
+
+                <!-- *************** Payroll ***********-->
+                {% if item.title == "M06-Payroll" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Payroll & HR &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Master data &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.HRMS Configurations" or sub.title == "A2.Allowance Masters" or sub.title == "A3.Deduction Masters" or sub.title == "A4.Loan Masters" or sub.title == "A5.Type of Documents" or sub.title == "A6.Leave Rules" or sub.title == "A5.Type of Documents" or  sub.title == "A6.Leave Rules" or sub.title == "A7.Air Ticket Rules" or sub.title == "A8.Employee Masters" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Payroll transactions &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Attendance Datas" or sub.title == "B2.Access Control Machine Datas" or sub.title == "B3.Daily Time Bookings" or sub.title == "B4.Monthly Time Bookings" or sub.title == "B5.Payroll Processs" or sub.title == "B6.Payroll Summary" or sub.title == "B7.Payroll Postings" or sub.title == "B8.Payroll Unpostings" or sub.title == "B9.End of Service" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>HR transactions &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Leave Applications" or sub.title == "C2.Employee Expense Claims" or sub.title == "C3.Help Desk Tickets" or sub.title == "C4.Employee Memos" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Self Services &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "Self Service Expense Claims" or sub.title == "Self Service Help Desks" or sub.title == "Self Service Leave apps" or sub.title == "Self Service Memos" or sub.title == "Self Service Monthly Timesheets" or sub.title == "Self Service Payslips" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "D1.Document Expiry Reports" or sub.title == "D2.WPS sif files" or sub.title == "D3.Payroll Checklists" or sub.title == "D4.Payslips"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endif %}
+
+                <!-- *************** CRM ***********-->
+                {% if item.title == "M02-CRM" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">CRM &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Marketing Events" or sub.title == "A2.Contact Masters" or  sub.title == "A3.Product Masters" or  sub.title == "A4.Pipeline Setups" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Activity &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                {% if sub.title == "B1.Leads" or sub.title == "B2.Opportunitys" or sub.title == "B3.Tasks" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                {% if sub.title == "c0.Sales Reports" or sub.title == "C1.Sales Action Reports" or sub.title == "C2.Sales Forecast Reports" or sub.title == "C3.Pipeline Status based on Leads" or sub.title == "C4.Pipeline Status based on Opportunitys" or sub.title == "C5.Opportunity Review Reports" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+
+                <!-- *************** Sales ***********-->
+                {% if item.title == "M03-Sales" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Sales &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Sales Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in  menu|lookup:"M05-Inventory"  %}
+                                    {% if sub.title == "A7.Customer Price Lists" or sub.title == "A8.Price Update by Groups" or sub.title == "A9.Price Update by Items" %}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Salesline Revisions" or sub.title == "B2.Sales Enquirys" or sub.title == "B3.Prepare Quotes" or  sub.title == "B4.Release Quotes" or  sub.title == "B5.Generate Proforma Invoices" or  sub.title == "B6.Print Proforma Invoices" or  sub.title == "B7.Sales Order Entrys" or  sub.title == "B8.Release Sales Orders" or sub.title == "C1.Sales Replacements" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Sales Invoicing &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Daily Price Updates" or sub.title == "B2.Compare Prices" or sub.title == "A1.Credit Sales Invoices" or sub.title == "A2.Post Credit Sale Invoices" or sub.title == "A3.Unpost Credit Sale Invoices" or sub.title == "A4.Cash Sales Invoices" or sub.title == "A5.Sales Return Invoices" or sub.title == "A6.Additional Cost of Sales Invoices" or sub.title == "A7.Post Sales Additional Costs" or sub.title == "A8.Unpost Sales Additional Costs" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Sales Report &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "D1.Monthly Sales Orders" or sub.title == "D2.Salesman wise Reports" or sub.title == "D3.Whole Sales Reports" or  sub.title == "D4.Customer Wise Sales Reports" or  sub.title == "D5.Cash Sales Reports" or  sub.title == "D6.Detail Markup Reports"  or  sub.title == "D7.Sales Reports" or  sub.title == "D8.Sales Order Summary Reports" or  sub.title == "D81.Sales Order Details Reports" or  sub.title == "D82.Sales Despatch Summary Reports"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                       <li class="smenu"><a>Delivery Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                   {% if sub.title == "B3.Shipment Advices" or  sub.title == "B4.Pick Slips" or  sub.title == "B5.Reserve Stocks" or  sub.title == "B6.Dispatchs" or sub.title == "C1.Sales Replacements"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+
+                <!-- *************** Procurement ***********-->
+                {% if item.title == "M04-Procurement" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Procurement &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>PO process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Stock Purchase Orders" or  sub.title == "A2.Non Stock Purchase Orders"  or sub.title == "A3.Drop Shipment Purchase Orders" or sub.title == "A4.Import Purchase Orders" or sub.title == "A6.Goods Receipt Notes"  or sub.title == "A9.Purchase Requisitions" or sub.title == "A91.Quote Requests" or  sub.title == "A7.Sub Contract Orders"  or sub.title == "A8.Shipments" or sub.title == "A9.Letter of Credits" or sub.title == "A12.Release POs" or sub.title == "A31.Requisition Approvals" or sub.title == "A91.Allocate LOCs" or sub.title == "B1.Stock PO Item Revisions" or  sub.title == "B2.Stock Purchase Returns"  or  sub.title == "B7.Post Non Stock POs" or sub.title == "B8.Unpost Non Stock POs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Invoicing &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A5.Purchase Invoices" or sub.title == "A7.Purchase Additional Costs" or sub.title == "B3.Invoice Match With GRs" or sub.title == "B4.Invoice Match WithOut GRs" or sub.title == "B5.Post Purchase Invoices" or sub.title == "B6.UnPost Purchase Invoices"  or sub.title == "B9.Post Additional Costs" or sub.title == "B10.UnPost Additional Costs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Stock PO Details" or  sub.title == "C11.Stock PO Summarys" or sub.title == "C12.Pending Stock POs" or sub.title == "C13.PO Analysis Summarys" or sub.title == "C14.PO Analysis-Suppliers" or sub.title == "C15.Not Billed Purchase Orders" or  sub.title == "C16.Purchase Order Status Reports" or sub.title == "C17.PO Invoice Reports" or sub.title == "C2.Non Stock PO Details" or sub.title == "C21.Non Stock PO Summarys" or sub.title == "C22.Pending Non Stock POs" or  sub.title == "C3.Drop Shipment PO Details" or sub.title == "C31.Drop Shipment PO Summarys" or sub.title == "C4.Sub Contract Order Details" or sub.title == "C41.Sub Contract Order Summarys" or sub.title == "C5.Purchase Ledger Accounts" or  sub.title == "C6.Purchase Invoice Agings" or sub.title == "C7.Purchase Payment Reports" or sub.title == "C8.Purchase Price Reports" or sub.title == "C9.LC Reports"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+
+                <!-- *************** Inventory ***********-->
+                {% if item.title == "M05-Inventory" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Inventory &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Inventory Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Items Masters" or sub.title == "A2.Non-Inventory Items Masters" or sub.title == "A3.Opening Stocks" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers" or sub.title == "A6.Batch Setups"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Stock Transfers" or sub.title == "B2.Stock Adjustements" or sub.title == "B3.Goods Receipts" or  sub.title == "B4.Goods Issues" or  sub.title == "B5.Stock Enquirys" or  sub.title == "B6.Item Convertions" or  sub.title == "B7.Item Assemblys" or  sub.title == "B8.Requisitions" or  sub.title == "B9.Batch Enquirys"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                {% if sub.title == "C1.Item Ledgers" or sub.title == "C11.Item Price Trends" or sub.title == "C12.Item Wise Profit Reports" or  sub.title == "C13.Last Supplied Items" or  sub.title == "C21.Goods Receipt Summarys" or sub.title == "C22.Goods Issue Summarys" or sub.title == "C23.Goods Transfer Summarys" or sub.title == "C3.Stock Reports" or  sub.title == "C31.Sample Stock Reports" or  sub.title == "C32.As Of Date Stock Reports" or sub.title == "C33.Stock Count Reports" or sub.title == "C34.Stock Valuation Reports" or sub.title == "C35.Stock Summary Reports" or  sub.title == "C36.Stock Aging Reports" or  sub.title == "C37.Brand wise stock Reports" or sub.title == "C41.ABC Analysiss" or sub.title == "C42.Supply / Demand Analysiss" or sub.title == "C43.Price Trend Analysiss" or  sub.title == "C44.Purchase Analysiss" or  sub.title == "C5.Post Inventory Transactions" or  sub.title == "C6.GRV Summary Lists"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+
+                 <!-- *************** Trade ***********-->
+                 {% if item.title == "M11-Trade" %}
+                 <li class="pmenu">
+                     <a href="{{ item.url }}">Trade &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                     {% if item.children|length > 1 %}
+                     <ul class="slist">
+                         <li class="smenu"><a>Trade Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "A1.Customers" or sub.title == "A2.Suppliers" or sub.title == "A3.Item (Stores) Masters" or sub.title == "A4.Item  (Finished Goods) Masters" or sub.title == "A5.Document Types" or sub.title == "A6.Document Numbers" or sub.title == "A7.Selling Price Lists" or sub.title == "A8.Selling Price Updates" or sub.title == "A9.CustomerWise Price Updates"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Sales Invoicing &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M03-Sales" %}
+                                    {% if sub.title == "B1.Daily Price Updates" or sub.title == "B2.Compare Prices" or sub.title == "A1.Credit Sales Invoices" or sub.title == "A2.Post Credit Sale Invoices" or sub.title == "A3.Unpost Credit Sale Invoices" or sub.title == "A4.Cash Sales Invoices" or sub.title == "A5.Sales Return Invoices" or sub.title == "A6.Additional Cost of Sales Invoices" or sub.title == "A7.Post Sales Additional Costs" or sub.title == "A8.Unpost Sales Additional Costs" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "A7.Customer Price Lists" or sub.title == "A8.Price Update by Groups" or sub.title == "A9.Price Update by Items" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D4.Credit Days From" or sub.title == "D5.Mode of Pay" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Sales Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M03-Sales" %}
+                                    {% if sub.title == "B1.Salesline Revisions" or sub.title == "B2.Sales Enquirys" or sub.title == "B3.Prepare Quotes" or  sub.title == "B4.Release Quotes" or  sub.title == "B5.Generate Proforma Invoices" or  sub.title == "B6.Print Proforma Invoices" or  sub.title == "B7.Sales Order Entrys" or  sub.title == "B8.Release Sales Orders" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Delivery Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                    {% if sub.title == "B3.Shipment Advices" or  sub.title == "B4.Pick Slips" or  sub.title == "B5.Reserve Stocks" or  sub.title == "B6.Dispatchs" or sub.title == "C1.Sales Replacements"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                                 {% for sub in menu|lookup:"M03-Sales" %}
+                                    {% if sub.title == "B3.Shipment Advices" or  sub.title == "B4.Pick Slips" or  sub.title == "B5.Reserve Stocks" or  sub.title == "B6.Dispatchs" or sub.title == "C1.Sales Replacements"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Sales Report &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M03-Sales" %}
+                                    {% if sub.title == "D1.Monthly Sales Orders" or sub.title == "D2.Salesman wise Reports" or sub.title == "D3.Whole Sales Reports" or  sub.title == "D4.Customer Wise Sales Reports" or  sub.title == "D5.Cash Sales Reports" or  sub.title == "D6.Detail Markup Reports"  or  sub.title == "D7.Sales Reports" or  sub.title == "D8.Sales Order Summary Reports" or  sub.title == "D81.Sales Order Details Reports" or  sub.title == "D82.Sales Despatch Summary Reports"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Procurement &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "A1.Stock Purchase Orders" or  sub.title == "A2.Non Stock Purchase Orders"  or sub.title == "A3.Drop Shipment Purchase Orders" or sub.title == "A4.Import Purchase Orders" or sub.title == "A5.Purchase Invoices" or sub.title == "A6.Goods Receipt Notes" or sub.title == "A7.Purchase Additional Costs" or sub.title == "A9.Purchase Requisitions" or sub.title == "A91.Quote Requests" or sub.title == "A5.Purchase Invoices" or sub.title == "A6.Sub Contract Orders" or sub.title == "A7.Additional Costs" or sub.title == "A8.Shipments" or sub.title == "A9.Letter of Credits" or sub.title == "A12.Release POs" or sub.title == "A31.Requisition Approvals" or sub.title == "A91.Allocate LOCs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D4.Credit Days From" or sub.title == "D5.Mode of Pay" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "B1.Stock PO Item Revisions" or  sub.title == "B2.Stock Purchase Returns" or sub.title == "B3.Invoice Match With GRs" or sub.title == "B4.Invoice Match WithOut GRs" or sub.title == "B5.Post Purchase Invoices" or sub.title == "B6.UnPost Purchase Invoices" or  sub.title == "B7.Post Non Stock POs" or sub.title == "B8.Unpost Non Stock POs" or sub.title == "B9.Post Additional Costs" or sub.title == "B10.UnPost Additional Costs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "C1.Stock PO Details" or  sub.title == "C11.Stock PO Summarys" or sub.title == "C12.Pending Stock POs" or sub.title == "C13.PO Analysis Summarys" or sub.title == "C14.PO Analysis-Suppliers" or sub.title == "C15.Not Billed Purchase Orders" or  sub.title == "C16.Purchase Order Status Reports" or sub.title == "C17.PO Invoice Reports" or sub.title == "C2.Non Stock PO Details" or sub.title == "C21.Non Stock PO Summarys" or sub.title == "C22.Pending Non Stock POs" or  sub.title == "C3.Drop Shipment PO Details" or sub.title == "C31.Drop Shipment PO Summarys" or sub.title == "C4.Sub Contract Order Details" or sub.title == "C41.Sub Contract Order Summarys" or sub.title == "C5.Purchase Ledger Accounts" or  sub.title == "C6.Purchase Invoice Agings" or sub.title == "C7.Purchase Payment Reports" or sub.title == "C8.Purchase Price Reports" or sub.title == "C9.LC Reports"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "A1.Items Masters" or sub.title == "A2.Non-Inventory Items Masters" or sub.title == "A3.Opening Stocks" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers" or sub.title == "A6.Batch Setups"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D1.UoM Masters" or sub.title == "D2.UoM Conversions" or sub.title == "D3.Unit Classifications"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "B1.Stock Transfers" or sub.title == "B2.Stock Adjustements" or sub.title == "B3.Goods Receipts" or  sub.title == "B4.Goods Issues" or  sub.title == "B5.Stock Enquirys" or  sub.title == "B6.Item Convertions" or  sub.title == "B7.Item Assemblys" or  sub.title == "B8.Requisitions" or  sub.title == "B9.Batch Enquirys"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                {% if sub.title == "C1.Item Ledgers" or sub.title == "C11.Item Price Trends" or sub.title == "C12.Item Wise Profit Reports" or  sub.title == "C13.Last Supplied Items" or  sub.title == "C21.Goods Receipt Summarys" or sub.title == "C22.Goods Issue Summarys" or sub.title == "C23.Goods Transfer Summarys" or sub.title == "C3.Stock Reports" or  sub.title == "C31.Sample Stock Reports" or  sub.title == "C32.As Of Date Stock Reports" or sub.title == "C33.Stock Count Reports" or sub.title == "C34.Stock Valuation Reports" or sub.title == "C35.Stock Summary Reports" or  sub.title == "C36.Stock Aging Reports" or  sub.title == "C37.Brand wise stock Reports" or sub.title == "C41.ABC Analysiss" or sub.title == "C42.Supply / Demand Analysiss" or sub.title == "C43.Price Trend Analysiss" or  sub.title == "C44.Purchase Analysiss" or  sub.title == "C5.Post Inventory Transactions" or  sub.title == "C6.GRV Summary Lists"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+
+                     </ul>
+                     {% endif %}
+
+                 </li>
+                 {% endif %}
+                  <!-- *************** Service ***********-->
+                {% if item.title == "M14-Service" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Service &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Service Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Equipment Masters" or sub.title == "A11.Category Masters" or sub.title == "A12.Symptom  Masters" or sub.title == "A13.Cause  Masters" or sub.title == "A14.Action Masters" or sub.title == "A2.Employee Category Masters" or sub.title == "A3.Service Types" or sub.title == "A4.Unit Rate for Service Types" or sub.title == "A5.Document Types"  or sub.title == "A51.Document Numbers" or sub.title == "A6.Call Prioritys" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Services &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Equipment Installations" or sub.title == "B2.Service Calls" or sub.title == "B3.Open Jobcards" or  sub.title == "B4.Closed Jobcards" or  sub.title == "B5.Pending Calls" or  sub.title == "B6.Service Agreements" or  sub.title == "B7.Generate Invoices" or  sub.title == "B8.Post Inv to Accounts" or  sub.title == "B9.Unpost Invoices"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Service Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Open Jobcards Reports" or sub.title == "C2.Closed Jobcards Reports" or sub.title == "C3.All JobCards" or  sub.title == "C4.Machines on Field Reports" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Procurement &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "A1.Stock Purchase Orders" or  sub.title == "A2.Non Stock Purchase Orders" or sub.title == "A3.Purchase Requisitions" or sub.title == "A4.Purchase Quotations" or sub.title == "A5.Purchase Invoices" or sub.title == "A6.Sub Contract Orders" or sub.title == "A7.Additional Costs" or sub.title == "A8.Shipments" or sub.title == "A11.Import Purchase Orders" or sub.title == "A12.Release POs" or sub.title == "A31.Requisition Approvals"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D4.Credit Days From" or sub.title == "D5.Mode of Pay" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "B1.Stock PO Item Revisions" or  sub.title == "B2.Stock Purchase Returns" or sub.title == "B3.Invoice Match With GRs" or sub.title == "B4.Invoice Match WithOut GRs" or sub.title == "B5.Post Purchase Invoices" or sub.title == "B6.UnPost Purchase Invoices" or  sub.title == "B7.Post Non Stock POs" or sub.title == "B8.Unpost Non Stock POs" or sub.title == "B9.Post Additional Costs" or sub.title == "B10.UnPost Additional Costs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "C1.Stock PO Details" or  sub.title == "C11.Stock PO Summarys" or sub.title == "C12.Pending Stock POs" or sub.title == "C13.PO Analysis Summarys" or sub.title == "C14.PO Analysis-Suppliers" or sub.title == "C15.Not Billed Purchase Orders" or  sub.title == "C16.Purchase Order Status Reports" or sub.title == "C17.PO Invoice Reports" or sub.title == "C2.Non Stock PO Details" or sub.title == "C21.Non Stock PO Summarys" or sub.title == "C22.Pending Non Stock POs" or sub.title == "C4.Sub Contract Order Details" or sub.title == "C41.Sub Contract Order Summarys" or sub.title == "C5.Purchase Ledger Accounts" or  sub.title == "C6.Purchase Invoice Agings" or sub.title == "C7.Purchase Payment Reports" or sub.title == "C8.Purchase Price Reports"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "A1.Items Masters" or sub.title == "A2.Non-Inventory Items Masters" or sub.title == "A3.Opening Stocks" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers" or sub.title == "A6.Batch Setups"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D1.UoM Masters" or sub.title == "D2.UoM Conversions" or sub.title == "D3.Unit Classifications"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "B1.Stock Transfers" or sub.title == "B2.Stock Adjustements" or sub.title == "B3.Goods Receipts" or  sub.title == "B4.Goods Issues" or  sub.title == "B5.Stock Enquirys" or  sub.title == "B6.Item Convertions" or  sub.title == "B7.Item Assemblys" or  sub.title == "B8.Requisitions" or  sub.title == "B9.Batch Enquirys"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                {% if sub.title == "C1.Item Ledgers" or sub.title == "C11.Item Price Trends" or sub.title == "C12.Item Wise Profit Reports" or  sub.title == "C13.Last Supplied Items" or  sub.title == "C21.Goods Receipt Summarys" or sub.title == "C22.Goods Issue Summarys" or sub.title == "C23.Goods Transfer Summarys" or sub.title == "C3.Stock Reports" or  sub.title == "C31.Sample Stock Reports" or  sub.title == "C32.As Of Date Stock Reports" or sub.title == "C33.Stock Count Reports" or sub.title == "C34.Stock Valuation Reports" or sub.title == "C35.Stock Summary Reports" or  sub.title == "C36.Stock Aging Reports" or  sub.title == "C37.Brand wise stock Reports" or sub.title == "C41.ABC Analysiss" or sub.title == "C42.Supply / Demand Analysiss" or sub.title == "C43.Price Trend Analysiss" or  sub.title == "C44.Purchase Analysiss" or  sub.title == "C5.Post Inventory Transactions" or  sub.title == "C6.GRV Summary Lists"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+                <!-- *************** Insure ***********-->
+                {% if item.title == "M15-Insure" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Insure &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Re Insurers" or sub.title == "A21.Ceding Companys" or sub.title == "A22.Insured Companys" or sub.title == "A23.Insurance Companys" or sub.title == "A31.Customers" or sub.title == "A32.Agents" or sub.title == "A33.Sales Mans" or sub.title == "A41.Currency Masters" or sub.title == "A42.Currency Rates"  or sub.title == "A51.Locations" or sub.title == "A52.Coverages"  or sub.title == "A53.Looking Masters" or sub.title == "A6.Policy Types"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Policy Contracts &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Re Insurance Marines" or sub.title == "B2.Closing Note Marines" or sub.title == "B3.Cover Note Marines" or  sub.title == "B4.ReInsurance Non Marines" or  sub.title == "B5.Closing Note Non Marines" or  sub.title == "B6.Cover Note Non Marines" or  sub.title == "B7.Debit Notes" or  sub.title == "B8.Post to A/cs Credit Notes" or  sub.title == "B9.Credit Notes" or sub.title == "B91.Post to A/cs Debit Notes"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Transactions &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Treatys" or sub.title == "C2.Non Motor Insurances" or sub.title == "C3.Endorse Cover Notes" or  sub.title == "C31.Endorse Closing Notes" or  sub.title == "C4.UnPost to A/cs Credit Notes" or sub.title == "C41.UnPost to A/cs Debit Notes" or sub.title == "C5.Cover Note-Liabilitys" or sub.title == "C51.Closing Note-Liabilitys" or  sub.title == "C6.Liability Debit Notes" or  sub.title == "C61.Liability Credit Notes" or sub.title == "C7.Policy Invoicings" or sub.title == "C71.Invoicing Allocations" or sub.title == "C72.Invoicing Postings" or  sub.title == "C73.UnPost Invoices" or  sub.title == "C74.Import Data to Accounts" or sub.title == "C75.Unpost Imported datas" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "D11.Credit Notes" or sub.title == "D12.Debit Notes" or sub.title == "D21.Cover Note Marines" or  sub.title == "D22.Closing Note Marines" or  sub.title == "D31.Cover Note Non Marines" or sub.title == "D32.Closing Note Non Marines" or sub.title == "D41.Cover Note-Liabilitys" or sub.title == "D42.Closing Note-Liabilitys" or  sub.title == "D51.Query Liability Debit Notes" or  sub.title == "D52.Query Liability Credit Notes" or sub.title == "D6.Sales by Periods"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Query &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "E1.Invoice Querys" or sub.title == "E2.Policy Due for Renewals" or sub.title == "E3.Policy Querys" or  sub.title == "E4.Re Insurance Production Reports" or  sub.title == "E5.Re Insurance Coverage Reports" or sub.title == "E6.Re Insurance Summary Reports" or sub.title == "E7.Ceding Co. Summary Reports" or sub.title == "E8.Insured Co. Summary Reports" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+                <!-- *************** Garage ***********-->
+                {% if item.title == "M16-Garage" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Garage &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Vehicle Masters" or sub.title == "A2.Service Types" or sub.title == "A3.Unit Rate for Service Types" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Work Order &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Prepare Estimates" or sub.title == "B2.Open Job Cards" or sub.title == "B3.Close Job Cards" or  sub.title == "B4.Generate Invoices" or  sub.title == "B5.Post Inv to Accounts" or  sub.title == "B6.Unpost Invoices"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Supply &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Open Sub Contract Orders" or sub.title == "C2.Close Subcontract  Orders" or sub.title == "C3.Post Subcontract Invoices" or  sub.title == "C4.Unpost Subcontract Invoices" or  sub.title == "C5.Certificates" or sub.title == "C6.Post Certificates" or sub.title == "C7.UnPost Certificates" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "D1.Open Jobcards Reports" or sub.title == "D2.Closed Jobcards Reports" or sub.title == "D3.All JobCards" or  sub.title == "D4.Service Invoices" or  sub.title == "D5.Gate pass Reports"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Procurement &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "A1.Stock Purchase Orders" or  sub.title == "A2.Non Stock Purchase Orders" or sub.title == "A3.Purchase Requisitions" or sub.title == "A4.Purchase Quotations" or sub.title == "A5.Purchase Invoices" or sub.title == "A6.Sub Contract Orders" or sub.title == "A7.Additional Costs" or sub.title == "A8.Shipments" or sub.title == "A11.Import Purchase Orders" or sub.title == "A12.Release POs" or sub.title == "A31.Requisition Approvals"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D4.Credit Days From" or sub.title == "D5.Mode of Pay" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "B1.Stock PO Item Revisions" or  sub.title == "B2.Stock Purchase Returns" or sub.title == "B3.Invoice Match With GRs" or sub.title == "B4.Invoice Match WithOut GRs" or sub.title == "B5.Post Purchase Invoices" or sub.title == "B6.UnPost Purchase Invoices" or  sub.title == "B7.Post Non Stock POs" or sub.title == "B8.Unpost Non Stock POs" or sub.title == "B9.Post Additional Costs" or sub.title == "B10.UnPost Additional Costs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "C1.Stock PO Details" or  sub.title == "C11.Stock PO Summarys" or sub.title == "C12.Pending Stock POs" or sub.title == "C13.PO Analysis Summarys" or sub.title == "C14.PO Analysis-Suppliers" or sub.title == "C15.Not Billed Purchase Orders" or  sub.title == "C16.Purchase Order Status Reports" or sub.title == "C17.PO Invoice Reports" or sub.title == "C2.Non Stock PO Details" or sub.title == "C21.Non Stock PO Summarys" or sub.title == "C22.Pending Non Stock POs" or sub.title == "C4.Sub Contract Order Details" or sub.title == "C41.Sub Contract Order Summarys" or sub.title == "C5.Purchase Ledger Accounts" or  sub.title == "C6.Purchase Invoice Agings" or sub.title == "C7.Purchase Payment Reports" or sub.title == "C8.Purchase Price Reports"%}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "A1.Items Masters" or sub.title == "A2.Non-Inventory Items Masters" or sub.title == "A3.Opening Stocks" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers" or sub.title == "A6.Batch Setups"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D1.UoM Masters" or sub.title == "D2.UoM Conversions" or sub.title == "D3.Unit Classifications"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "B1.Stock Transfers" or sub.title == "B2.Stock Adjustements" or sub.title == "B3.Goods Receipts" or  sub.title == "B4.Goods Issues" or  sub.title == "B5.Stock Enquirys" or  sub.title == "B6.Item Convertions" or  sub.title == "B7.Item Assemblys" or  sub.title == "B8.Requisitions" or  sub.title == "B9.Batch Enquirys"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                {% if sub.title == "C1.Item Ledgers" or sub.title == "C11.Item Price Trends" or sub.title == "C12.Item Wise Profit Reports" or  sub.title == "C13.Last Supplied Items" or  sub.title == "C21.Goods Receipt Summarys" or sub.title == "C22.Goods Issue Summarys" or sub.title == "C23.Goods Transfer Summarys" or sub.title == "C3.Stock Reports" or  sub.title == "C31.Sample Stock Reports" or  sub.title == "C32.As Of Date Stock Reports" or sub.title == "C33.Stock Count Reports" or sub.title == "C34.Stock Valuation Reports" or sub.title == "C35.Stock Summary Reports" or  sub.title == "C36.Stock Aging Reports" or  sub.title == "C37.Brand wise stock Reports" or sub.title == "C41.ABC Analysiss" or sub.title == "C42.Supply / Demand Analysiss" or sub.title == "C43.Price Trend Analysiss" or  sub.title == "C44.Purchase Analysiss" or  sub.title == "C5.Post Inventory Transactions" or  sub.title == "C6.GRV Summary Lists"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+                 <!-- *************** Drive ***********-->
+                 {% if item.title == "M17-Drive" %}
+                 <li class="pmenu">
+                     <a href="{{ item.url }}">Drive &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                     {% if item.children|length > 1 %}
+                     <ul class="slist">
+                         <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "A1.Vehicle Masters" or sub.title == "A2.Company Masters" or sub.title == "A3.Location Masters" or sub.title == "A4.Chauffer Masters" or sub.title == "A5.Customers" or sub.title == "A6.Seasons"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Pricing &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "B1.Price Lists" or sub.title == "B2.Group Wise Pricings" or sub.title == "B3.Prices-Hourlys" or sub.title == "B4.Prices-Transfers"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Sales &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "C1.Reserve Selfs" or sub.title == "C2.Reserve Full Day Chauffer Services" or sub.title == "C3.Reserve Transfers" or sub.title == "C4.Reserve Hourly Trips" or sub.title == "C5.Open RA : Self Drives" or sub.title == "C6.Open RA : FDCSs" or sub.title == "C7.Replace Vehicle: Self Drives" or sub.title == "C8.Replace Vehicle: Full day chauffer services" or sub.title == "C9.Close Contract : Self Drives" or sub.title == "C10.Enquirys"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Maintenance &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "D1.Customer supports" or sub.title == "D2.Non Revenue Tickets" or sub.title == "D3.Penaltys"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Alerts &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "E1.Alert - Expected Availabilitys" or sub.title == "E2.Automatic Alerts" or sub.title == "E3.Alert - Service Dues" or sub.title == "E4.Alert - Registration Dues" or sub.title == "E5.Alert - PDC dues"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Queries &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "F1.Trips" or sub.title == "F2.Penalty Receipt Prints" or sub.title == "F3.Receipt Querys" or sub.title == "F4.Query Customers" or sub.title == "F5.Query Vehicles" or sub.title == "F6.Query Contracts" or sub.title == "F7.Query Invoices"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>General Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "G1.Asset Valuation Reports" or sub.title == "G2.Statement of Accounts" or sub.title == "G3.Collection Summary Reports" or sub.title == "G4.Shiftwise Invoice Reports" or sub.title == "G5.Cancelled Contracts" or sub.title == "G6.Closed Contracts Reports" or sub.title == "G7.Fleet Status Reports" or sub.title == "G8.Sales Reports" or sub.title == "G9.Utility Reports" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Vehicle & Service Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "H1.Reservations" or sub.title == "H2.Penalty Reports" or sub.title == "H3.Vehicle Availability Reports" or sub.title == "H4.Vehicles On Hires" or sub.title == "H5.Service History Reports" or sub.title == "H6.Service Status Reports" or sub.title == "H7.Customer Service Reports"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Invoicing &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "H1.Reservations" or sub.title == "H2.Penalty Reports" or sub.title == "H3.Vehicle Availability Reports" or sub.title == "H4.Vehicles On Hires" or sub.title == "H5.Service History Reports" or sub.title == "H6.Service Status Reports" or sub.title == "H7.Customer Service Reports"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                     </ul>
+                     {% endif %}
+
+                 </li>
+                 {% endif %}
+
+                 <!-- *************** Drive ***********-->
+                 {% if item.title == "M18-Events" %}
+                 <li class="pmenu">
+                     <a href="{{ item.url }}">Events &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                     {% if item.children|length > 1 %}
+                     <ul class="slist">
+                         <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "A1.Services" or sub.title == "A2.Events" or sub.title == "A3.Agents" or sub.title == "A4.Clients" or sub.title == "A5.Groups" or sub.title == "A6.Employees" or sub.title == "A7.Seasons" or sub.title == "A8.Pricings" or sub.title == "A9.Suppliers"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Project Proposal &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "B1.Enquiry Registrations" or sub.title == "B2.Prepare Proposals" or sub.title == "B3.Copy Proposals" or sub.title == "B4.Revise / Confirm Proposals"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Project Scheduling &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "C1.Re Confirm Proposals" or sub.title == "C2.Current Orders" or sub.title == "C3.Generate Invoices" or sub.title == "C4.Invoice Postings" or sub.title == "C5.Invoice Unpostings" or sub.title == "C6.Invoice Revisions" or sub.title == "C7.Final Invoices" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Service &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "D1.Budget Sheets" or sub.title == "D2.Plan By Customers" or sub.title == "D3.Plan By Destinations" or sub.title == "D4.Plan By Dates" or sub.title == "D5.Plan By Staff Assigneds" or sub.title == "D6.Log By Customers" or sub.title == "D7.Log By Destinations" or sub.title == "D8.Log By Dates" or sub.title == "D9.Log By Executed Staffs"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Query &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "E1.Query Proposals" or sub.title == "E2.Query Proforma Invoices" or sub.title == "E3.Query Budget Sheets" or sub.title == "E4.Query Cost Sheets" or sub.title == "E5.Query Action Plans" or sub.title == "E6.Query Activity Loggeds" or sub.title == "E7.Query Project Activities"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Report &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "F1.Proposal Summary Reports" or sub.title == "F2.Orders Summary Reports" or sub.title == "F3.Monthly Sales Reports" or sub.title == "F4.Collection Reports" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                     </ul>
+                     {% endif %}
+
+                 </li>
+                 {% endif %}
+
+
+                 <!-- *************** Contract ***********-->
+                {% if item.title == "M21-Contract" %}
+                <li class="pmenu">
+                    <a href="{{ item.url }}">Contract &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                    {% if item.children|length > 1 %}
+                    <ul class="slist">
+                        <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "A1.Bill of Quantities Masters" or sub.title == "A2.Client Masters" or sub.title == "A3.Consultant Masters" or sub.title == "A4.Lookup Masters" or sub.title == "A5.Subcontractors Masters" or sub.title == "A6.Prospects" or sub.title == "A7.Print Unit Rate for Tasks"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Template &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "B1.Phase Masters" or sub.title == "B2.Task Masters" or sub.title == "B3.Work Order Masters" or sub.title == "B4.Response Letter Templates"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Tendering &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "C1.Tender Requests" or sub.title == "C2.Prepare Tenders" or sub.title == "C3.Copy Tenders" or sub.title == "C4.Revise Tenders" or sub.title == "C5.Submit Tenders" or sub.title == "C6.Sub Contracts" or sub.title == "C7.Payables to Accounts"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Project &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "D1.Project Deposits" or sub.title == "D2.Project Revisions" or sub.title == "D3.Assign Roles"  or sub.title == "D4.WIP and Invoicings"  or sub.title == "D5.Certify Invoices"  or sub.title == "D6.Post Invoices" or sub.title == "D7.UnPost Invoices"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Documentation &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "E1.Tender Responses" or sub.title == "E2.Decline Tenders" or sub.title == "E3.Upload Documents"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Analysis &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "F1.Tender Analysiss" or sub.title == "F2.Tender Profit Estimates" or sub.title == "F3.Tender Statuss" or sub.title == "F4.Tender Workouts"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in item.children %}
+                                    {% if sub.title == "G1.Purchase Analysis Item With Costs" or sub.title == "G2.Purchase Analysis Item Without Costs" or sub.title == "G3.Purchase Analysis By Purchase Orders" or sub.title == "G4.Job Status Analysises" or sub.title == "G5.Estimation Variance Analysises" or sub.title == "G6.Project Expenses Analysises" or sub.title == "G7.Retention Analysises" or sub.title == "G8.Project Analysises"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Procurement &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "A1.Stock Purchase Orders" or  sub.title == "A2.Non Stock Purchase Orders" or sub.title == "A3.Purchase Requisitions" or sub.title == "A4.Purchase Quotations" or sub.title == "A5.Purchase Invoices" or sub.title == "A6.Sub Contract Orders" or sub.title == "A7.Additional Costs" or sub.title == "A8.Shipments" or sub.title == "A11.Import Purchase Orders" or sub.title == "A12.Release POs" or sub.title == "A31.Requisition Approvals" or sub.title == "A9.Letter of Credits" or sub.title == "A91.Allocate LOCs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D4.Credit Days From" or sub.title == "D5.Mode of Pay" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "B1.Stock PO Item Revisions" or  sub.title == "B2.Stock Purchase Returns" or sub.title == "B3.Invoice Match With GRs" or sub.title == "B4.Invoice Match WithOut GRs" or sub.title == "B5.Post Purchase Invoices" or sub.title == "B6.UnPost Purchase Invoices" or  sub.title == "B7.Post Non Stock POs" or sub.title == "B8.Unpost Non Stock POs" or sub.title == "B9.Post Additional Costs" or sub.title == "B10.UnPost Additional Costs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "C1.Stock PO Details" or  sub.title == "C11.Stock PO Summarys" or sub.title == "C12.Pending Stock POs" or sub.title == "C13.PO Analysis Summarys" or sub.title == "C14.PO Analysis-Suppliers" or sub.title == "C15.Not Billed Purchase Orders" or  sub.title == "C16.Purchase Order Status Reports" or sub.title == "C17.PO Invoice Reports" or sub.title == "C2.Non Stock PO Details" or sub.title == "C21.Non Stock PO Summarys" or sub.title == "C22.Pending Non Stock POs" or sub.title == "C4.Sub Contract Order Details" or sub.title == "C41.Sub Contract Order Summarys" or sub.title == "C5.Purchase Ledger Accounts" or  sub.title == "C6.Purchase Invoice Agings" or sub.title == "C7.Purchase Payment Reports" or sub.title == "C8.Purchase Price Reports" or sub.title == "C9.LC Reports"%}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "A1.Items Masters" or sub.title == "A2.Non-Inventory Items Masters" or sub.title == "A3.Opening Stocks" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers" or sub.title == "A6.Batch Setups"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D1.UoM Masters" or sub.title == "D2.UoM Conversions" or sub.title == "D3.Unit Classifications"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "B1.Stock Transfers" or sub.title == "B2.Stock Adjustements" or sub.title == "B3.Goods Receipts" or  sub.title == "B4.Goods Issues" or  sub.title == "B5.Stock Enquirys" or  sub.title == "B6.Item Convertions" or  sub.title == "B7.Item Assemblys" or  sub.title == "B8.Requisitions" or  sub.title == "B9.Batch Enquirys"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                {% if sub.title == "C1.Item Ledgers" or sub.title == "C11.Item Price Trends" or sub.title == "C12.Item Wise Profit Reports" or  sub.title == "C13.Last Supplied Items" or  sub.title == "C21.Goods Receipt Summarys" or sub.title == "C22.Goods Issue Summarys" or sub.title == "C23.Goods Transfer Summarys" or sub.title == "C3.Stock Reports" or  sub.title == "C31.Sample Stock Reports" or  sub.title == "C32.As Of Date Stock Reports" or sub.title == "C33.Stock Count Reports" or sub.title == "C34.Stock Valuation Reports" or sub.title == "C35.Stock Summary Reports" or  sub.title == "C36.Stock Aging Reports" or  sub.title == "C37.Brand wise stock Reports" or sub.title == "C41.ABC Analysiss" or sub.title == "C42.Supply / Demand Analysiss" or sub.title == "C43.Price Trend Analysiss" or  sub.title == "C44.Purchase Analysiss" or  sub.title == "C5.Post Inventory Transactions" or  sub.title == "C6.GRV Summary Lists"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                </li>
+                {% endif %}
+                 <!-- *************** Manufacture ***********-->
+                {% if item.title == "M22-Manufacture" %}
+                 <li class="pmenu">
+                     <a href="{{ item.url }}">Manufacture &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                     {% if item.children|length > 1 %}
+                     <ul class="slist">
+                         <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "A1.Consultants" or sub.title == "A2.Prospects" or sub.title == "A3.Clients" or sub.title == "A4.Sub Contractors" or sub.title == "A5.UOM Conversions" or sub.title == "A6.Item (Structured Steel) Masters" or sub.title == "A7.Item Master Productions" or sub.title == "A8.BOQ Structured Steels" or sub.title == "A9.BOQ Productions" or sub.title == "A10.Price Lists" or sub.title == "A11.Process Masters" or sub.title == "A12.Group Masters"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Sales &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "B1.BOMs" or sub.title == "B2.Open Project Files" or sub.title == "B31.Fabrication Statuses" or sub.title == "B32.Painting Statuses" or sub.title == "B33.PMN Statuses" or sub.title == "B34.Production Statuses" or sub.title == "B41.Project Detail Reports" or sub.title == "B42.Monthly Reports" or sub.title == "B51.Prepare Job Cards" or sub.title == "B52.Approve Job Cards" or sub.title == "B61.Prepare / Edit Orders" or sub.title == "B62.Prepare/Edit  Quotes" or sub.title == "B63.Generate Sales Orders" or sub.title == "B64.Release Sales Orders" or sub.title == "B65.Generate Quotes" or sub.title == "B66.Release Quotes" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Cost Sheet &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "B71.Alter Cost Sheets" or sub.title == "B72.Copy Cost Sheets" or sub.title == "B73.Release Cost Sheets" or sub.title == "B74.Prepare SS Cost Sheets" or sub.title == "B75.Prepare Prod. Cost Sheets" or sub.title == "B76.Revise Order from Cost Sheets" or sub.title == "B77.Revise Quote from Cost Sheets" or sub.title == "B8.LPO Costings" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Procurement &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "A1.Stock Purchase Orders" or  sub.title == "A2.Non Stock Purchase Orders" or sub.title == "A3.Purchase Requisitions" or sub.title == "A4.Purchase Quotations" or sub.title == "A5.Purchase Invoices" or sub.title == "A6.Sub Contract Orders" or sub.title == "A7.Additional Costs" or sub.title == "A8.Shipments" or sub.title == "A11.Import Purchase Orders" or sub.title == "A12.Release POs" or sub.title == "A31.Requisition Approvals" or sub.title == "A9.Letter of Credits" or sub.title == "A91.Allocate LOCs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D4.Credit Days From" or sub.title == "D5.Mode of Pay" %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+
+                        </li>
+                        <li class="smenu"><a>PO process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "B1.Stock PO Item Revisions" or  sub.title == "B2.Stock Purchase Returns" or sub.title == "B3.Invoice Match With GRs" or sub.title == "B4.Invoice Match WithOut GRs" or sub.title == "B5.Post Purchase Invoices" or sub.title == "B6.UnPost Purchase Invoices" or  sub.title == "B7.Post Non Stock POs" or sub.title == "B8.Unpost Non Stock POs" or sub.title == "B9.Post Additional Costs" or sub.title == "B10.UnPost Additional Costs"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>PO Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M04-Procurement" %}
+                                    {% if sub.title == "C1.Stock PO Details" or  sub.title == "C11.Stock PO Summarys" or sub.title == "C12.Pending Stock POs" or sub.title == "C13.PO Analysis Summarys" or sub.title == "C14.PO Analysis-Suppliers" or sub.title == "C15.Not Billed Purchase Orders" or  sub.title == "C16.Purchase Order Status Reports" or sub.title == "C17.PO Invoice Reports" or sub.title == "C2.Non Stock PO Details" or sub.title == "C21.Non Stock PO Summarys" or sub.title == "C22.Pending Non Stock POs" or sub.title == "C4.Sub Contract Order Details" or sub.title == "C41.Sub Contract Order Summarys" or sub.title == "C5.Purchase Ledger Accounts" or  sub.title == "C6.Purchase Invoice Agings" or sub.title == "C7.Purchase Payment Reports" or sub.title == "C8.Purchase Price Reports" or sub.title == "C9.LC Reports"%}
+                                        <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "A1.Items Masters" or sub.title == "A2.Non-Inventory Items Masters" or sub.title == "A3.Opening Stocks" or sub.title == "A4.Document Types" or sub.title == "A5.Document Numbers" or sub.title == "A6.Batch Setups"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% for sub in menu|lookup:"M01-Foundation" %}
+                                    {% if sub.title == "D1.UoM Masters" or sub.title == "D2.UoM Conversions" or sub.title == "D3.Unit Classifications"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Process &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                    {% if sub.title == "B1.Stock Transfers" or sub.title == "B2.Stock Adjustements" or sub.title == "B3.Goods Receipts" or  sub.title == "B4.Goods Issues" or  sub.title == "B5.Stock Enquirys" or  sub.title == "B6.Item Convertions" or  sub.title == "B7.Item Assemblys" or  sub.title == "B8.Requisitions" or  sub.title == "B9.Batch Enquirys"%}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="smenu"><a>Inventory Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                            <ul class="tlist">
+                                {% for sub in menu|lookup:"M05-Inventory" %}
+                                {% if sub.title == "C1.Item Ledgers" or sub.title == "C11.Item Price Trends" or sub.title == "C12.Item Wise Profit Reports" or  sub.title == "C13.Last Supplied Items" or  sub.title == "C21.Goods Receipt Summarys" or sub.title == "C22.Goods Issue Summarys" or sub.title == "C23.Goods Transfer Summarys" or sub.title == "C3.Stock Reports" or  sub.title == "C31.Sample Stock Reports" or  sub.title == "C32.As Of Date Stock Reports" or sub.title == "C33.Stock Count Reports" or sub.title == "C34.Stock Valuation Reports" or sub.title == "C35.Stock Summary Reports" or  sub.title == "C36.Stock Aging Reports" or  sub.title == "C37.Brand wise stock Reports" or sub.title == "C41.ABC Analysiss" or sub.title == "C42.Supply / Demand Analysiss" or sub.title == "C43.Price Trend Analysiss" or  sub.title == "C44.Purchase Analysiss" or  sub.title == "C5.Post Inventory Transactions" or  sub.title == "C6.GRV Summary Lists"  %}
+                                    <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
+                         <li class="smenu"><a>Production &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "C1.Edit jobcards" or sub.title == "C2.Issue Items - Job Cards" or sub.title == "C3.Close Job Cards" or sub.title == "C4.Despatch Finished Goods" or sub.title == "C5.Post Production Items" or sub.title == "C6.Return Excess Store Items" or sub.title == "C7.Update Work(Fabrication) Progresses" or sub.title == "C8.Update Work(S.S.) Progresses" or sub.title == "C9.Daily Production(Fabrication) Updates" or sub.title == "C91.Daily Production(S.S.) Updates"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Accounts &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "D1.Generate Invoices" or sub.title == "D2.Sales Invoices" or sub.title == "D3.Upload Documents"  or sub.title == "D4.SalesReturns"  or sub.title == "D5.Sales Replacements"  or sub.title == "D6.Additional Cost of Sales Invoices" or sub.title == "D7.Post Sales Additional Costs" or sub.title == "D8.UnPost Sales Additional Costs"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+
+                         <li class="smenu"><a>Analysis &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "F1.Enquiry Analysises" or sub.title == "F2.Cost Analysises" or sub.title == "F3.Sales Analysises" or sub.title == "F4.Job Card Analysises"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "G1.Montly Production Report By Items" or sub.title == "G2.Monthly Production Report by Processes" or sub.title == "G3.Daily Production Reports" or sub.title == "G4.JobCard Reports"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+
+                     </ul>
+                     {% endif %}
+
+                 </li>
+                 {% endif %}
+                 <!-- *************** Clinic ***********-->
+                 {% if item.title == "M25-Clinic" %}
+                 <li class="pmenu">
+                     <a href="{{ item.url }}">Clinic &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                     {% if item.children|length > 1 %}
+                     <ul class="slist">
+                         <li class="smenu"><a>Setup &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "A1.Treatment Sessions" or sub.title == "A2.Treatment Types" or sub.title == "A3.Treatment Cycles" or sub.title == "A4.Treatement Venues" or sub.title == "A5.Procedure Lists" or sub.title == "A6.Procedure Costs" or sub.title == "A7.Section Users" or sub.title == "A8.Lab Testings" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Front Desk &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "B1.Reception Desks" or sub.title == "B2.Treatement Visits" or sub.title == "B3.Visit Billings" or sub.title == "B4.Visit Reports" %}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Consulting &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "C1.Doctor Schedules" or sub.title == "C2.Treatment Room Bookings" or sub.title == "C3.Lab test Reports" or sub.title == "C4.Doctor Reports" or sub.title == "C5.Prescriptions" or sub.title == "C6.Treatment Log Sheets"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+                         <li class="smenu"><a>Reports &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                             <ul class="tlist">
+                                 {% for sub in item.children %}
+                                     {% if sub.title == "D1.Patient treatment History Reports" or sub.title == "D2.Patient prescription History Reports" or sub.title == "D3.Billing Report by Doctors"  or sub.title == "D4.Billing Report by Sections"  or sub.title == "D5.Billing Report by Treatments"  or sub.title == "D6.Billing Report by Procedures"%}
+                                     <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                     {% endif %}
+                                 {% endfor %}
+                             </ul>
+                         </li>
+
+                     </ul>
+                     {% endif %}
+
+                 </li>
+                 {% endif %}
+                  <!-- *************** Water Distribution ***********-->
+                  {% if item.title == "M26-WaterSupply" %}
+                  <li class="pmenu">
+                      <a href="{{ item.url }}">Water Distribution &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                      {% if item.children|length > 1 %}
+                      <ul class="slist">
+                          <li class="smenu"><a>Sweet Water &nbsp; {% if item.children|length > 1 %}<span class="arrow"></span>{% endif %}</a>
+                              <ul class="tlist">
+                                  {% for sub in item.children %}
+                                      {% if sub.title == "A1.Storage Tanks" or sub.title == "A2.Tank Readings" or sub.title == "A3.Tank Reading Historys" or sub.title == "A4.Selling Prices" or sub.title == "A5.Selling Price Historys" or sub.title == "A6.Vehicle Registrations" or sub.title == "A7.Sales Invoices"  %}
+                                      <li><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+                                      {% endif %}
+                                  {% endfor %}
+                              </ul>
+                          </li>
+
+                      </ul>
+                      {% endif %}
+
+                  </li>
+                  {% endif %}
+                {% endfor %}
+
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+    {% comment %} {% endif %} {% endcomment %}
+    {% comment %} {% for title, item in menu.items %}
+        {% if item.active and item.children|length > 1 %}
+        <div id="secondary-nav">
+            <ul>
+            {% for sub in item.children %}
+                <li class="{% if sub.active %}active{% endif %}"><a href="{{ sub.url }}">{{ sub.title }}</a></li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endfor %} {% endcomment %}
+
+{% endblock %}
+
+{% block branding %}
+    {% if get_logo %}
+    {% get_logo as obj %}
+    {% endif %}
+    {% get_custom_logo as brandmark %}
+
+    {% if brandmark %}
+        {% if obj.logo_file_link %}
+        <img src="{{ obj.logo_file_link.url }}" id="branding" />
+        {% endif%}
+    {% else %}
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+    {% endif %}
+{% endblock %}
+{% block usertools %}
+        {% if has_permission %}
+        {% get_license_status as status %}
+        <div id="user-tools">
+            {% block welcome-msg %}
+                {% translate 'Welcome,' %}
+                <strong>{% firstof user.get_short_name user.get_username %}.</strong>
+            {% endblock %}
+            {% block userlinks %}
+                {% if site_url %}
+                    <a href="{{ site_url }}">{% translate 'View site' %}</a> /
+                {% endif %}
+                {% if user.is_active and user.is_staff %}
+                    {% url 'django-admindocs-docroot' as docsroot %}
+                    {% if docsroot %}
+                        <a href="{{ docsroot }}">{% translate 'Documentation' %}</a> /
+                    {% endif %}
+                {% endif %}
+                {% if user.has_usable_password %}
+                <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
+                {% endif %}
+                <a href="{% url 'admin:logout' %}">{% translate 'Log out' %}</a>
+                {% if status %}
+                    <span style="color: red;">- {{status}}</span>
+                {% endif %}
+            {% endblock %}
+        </div>
+    {% endif %}
+{% endblock %}

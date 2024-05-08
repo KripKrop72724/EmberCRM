@@ -1,0 +1,97 @@
+{% extends "admin/base_site.html" %}
+
+<!-- LOADING -->
+{% load i18n grp_tags log %}
+{% load static i18n get_user_groups %}
+
+<!-- JAVASCRIPTS -->
+{% block javascripts %}
+    {{ block.super }}
+{% endblock %}
+
+<!-- COLTYPE/BODYCLASS-- >
+{% block bodyclass %}dashboard{% endblock %}
+{% block content-class %}content-grid{% endblock %}
+<!-- BREADCRUMBS -->
+{% block breadcrumbs %}
+    <ul class="grp-horizontal-list">
+        <li>{% trans "Home" %}</li>
+    </ul>
+{% endblock %}
+
+
+{% block content_title %}
+    {% if title and request.user.is_superuser%}
+        <header><h1>{{ title }}</h1></header>
+    {% endif %}
+{% endblock %}
+
+
+<!-- CONTENT -->
+{% block content %}
+
+    {% include "dashboard/header.html" %}
+
+    {% if request.user.is_staff and request.user|has_group:"Crm" %}
+
+        <!--*********** CRM Dashboard ****************-->
+        {% include "dashboard/crm_dashboard.html" %}
+
+    {% elif request.user.is_staff and request.user|has_group:"Finance" %}
+
+        <!--*********** Finance Dashboard ****************-->
+        {% include "dashboard/fin_dashboard.html" %}
+
+    {% elif request.user.is_staff and request.user|has_group:"Trade" %}
+
+        <!--*********** Trade Dashboard ****************-->
+        {% include "dashboard/trade_dashboard.html" %}
+
+    {% elif request.user.is_staff and request.user|has_group:"Hrms" %}
+
+        <!--*********** HRMS Dashboard ****************-->
+        {% include "dashboard/hr_dashboard.html" %}
+
+    {% elif request.user.is_superuser %}
+            <div class="g-d-c">
+                <div class="g-d-12 g-d-f">
+                    {% for app in app_list %}
+                        <div class="grp-module" id="app_{{ app.name|lower }}">
+                            <h2><a href="{{ app.app_url }}" class="grp-section">{% trans app.name %}</a></h2>
+                            {% for model in app.models %}
+                                <div class="grp-row" id="model-{{ model.object_name|lower }}">
+                                    {% if model.admin_url %}
+                                        <a href="{{ model.admin_url }}"><strong>{{ model.name }}</strong></a>
+                                    {% else %}
+                                        <strong>{{ model.name }}</strong>
+                                    {% endif %}
+                                    {% if model.add_url %}
+                                        <ul class="grp-actions">
+                                            <li class="grp-icon grp-add-link">
+                                                <a href="{{ model.add_url }}" title="{% trans "Add" %}">&nbsp;</a>
+                                            </li>
+                                        </ul>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% empty %}
+                        <p>{% trans "You don´t have permission to edit anything." %}</p>
+                    {% endfor %}
+                    {% block custom_views %}
+                        {% if custom_list %}
+                            <div class="grp-module" id="custom_views">
+                                <h2>{% trans 'Custom Views' %}</h2>
+                                {% for path, name in custom_list %}
+                                    <div class="grp-row">
+                                        <a href="{{ path }}"><strong>{{ name }}</strong></a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endblock %}
+                </div>
+
+            </div>
+    {% endif %}
+{% endblock %}
