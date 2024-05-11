@@ -8,7 +8,7 @@ from django.urls import NoReverseMatch, resolve, reverse
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 
-from ebos2201.models.m01_core_mas import T01Cfg10
+from AP01.models.core import T01Cfg10
 
 register = template.Library()
 

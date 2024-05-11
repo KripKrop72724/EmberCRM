@@ -57,6 +57,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # packages
+    'simple_history',
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "import_export",
+    "rest_framework",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "drf_spectacular",
+    "django_filters",
+    "corsheaders",
+    "django_extensions",
+    "django_cleanup.apps.CleanupConfig",
+    "multiselectfield",
+    'social_django',
+    'channels',
+    'huey.contrib.djhuey',
+    # apps
+    'AP01'
 ]
 
 MIDDLEWARE = [

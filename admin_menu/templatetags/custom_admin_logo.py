@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 
-from ebos2201.models.m01_core_mas import T01Com10
+from AP01.models.core import T01Com10
 
 register = template.Library()
 
