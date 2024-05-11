@@ -600,6 +600,7 @@ class T02Rpt10(models.Model):
     date_upto = models.DateField(db_column='dUpTo', null=True)
     rpt_code = models.CharField(db_column='sRptCode', max_length=3, blank=True, null=True)
     report_csv = models.FileField(db_column='flSlAcRpt', upload_to='sales_reports', null=True, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         db_table = 'T02RPT10'
@@ -696,7 +697,7 @@ class T02Opr10(T02Rpt10):
         super(T02Opr10, self).save(*args, **kwargs)
 
 
-#### Actions Post Save of Proxy Models
+# Actions Post Save of Proxy Models
 @receiver(models.signals.post_save, sender=T02Sat10)
 @receiver(models.signals.post_save, sender=T02Sfc10)
 @receiver(models.signals.post_save, sender=T02Plr10)
@@ -890,6 +891,7 @@ class EmailTemplate(models.Model):
     template_name = models.CharField(max_length=255)
     template_content = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.template_name
@@ -901,6 +903,7 @@ class EmailSchedulerRooster(models.Model):
     recipient = models.EmailField()
     subject = models.CharField(max_length=255)
     sent = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f'{self.template.template_name} to {self.recipient} at {self.send_datetime}'
@@ -909,6 +912,7 @@ class EmailSchedulerRooster(models.Model):
 class DealQuestion(models.Model):
     question_text = models.TextField()
     order = models.IntegerField(unique=True, null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.question_text
@@ -925,6 +929,7 @@ class T02DL10(models.Model):
     created_on = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     file = models.ImageField(upload_to='deal_files/', null=True, blank=True, storage=SecureFileSystemStorage())
     order = models.IntegerField(blank=True, null=True, unique=True)
+    history = HistoricalRecords()
 
     class Meta:
         db_table = 'T02DL10'
@@ -957,6 +962,7 @@ class DealAnswer(models.Model):
     deal = models.ForeignKey(T02DL10, on_delete=models.CASCADE, related_name='deal_answers')
     question = models.ForeignKey(DealQuestion, on_delete=models.CASCADE)
     answer_text = models.TextField()
+    history = HistoricalRecords()
 
     class Meta:
         unique_together = ['deal', 'question']
@@ -974,173 +980,12 @@ class SalesmanStats(models.Model):
     closed_tasks = models.PositiveIntegerField(default=0)
     overdue_tasks = models.PositiveIntegerField(default=0)
     in_progress_tasks = models.PositiveIntegerField(default=0)
+    history = HistoricalRecords()
 
     class Meta:
         db_table = 'T02SLMSTATS'
         verbose_name = 'SLM Stats'
 
-
-# @receiver([post_save, post_delete, pre_save], sender=T02Led10)
-# def lead_changed(sender, instance, **kwargs):
-#     channel_layer = get_channel_layer()
-#     async_to_sync(channel_layer.group_send)(
-#         f"salesman_{instance.assigned_to_id}",
-#         {
-#             "type": "lead_task_changed",
-#             "salesman_id": instance.assigned_to_id
-#         }
-#     )
-#
-#
-# @receiver([post_save, post_delete, pre_save], sender=T02Tsk10)
-# def task_changed(sender, instance, **kwargs):
-#     channel_layer = get_channel_layer()
-#     async_to_sync(channel_layer.group_send)(
-#         f"salesman_{instance.lead.assigned_to_id}",
-#         {
-#             "type": "lead_task_changed",
-#             "salesman_id": instance.lead.assigned_to_id
-#         }
-#     )
-
-# @receiver(pre_save, sender=T02Led10)
-# def lead_pre_save_handler(sender, instance, **kwargs):
-#     print("Firing...")
-#     try:
-#         # store the old lead object before it is saved
-#         instance._old_lead = T02Led10.objects.get(pk=instance.pk)
-#     except T02Led10.DoesNotExist:
-#         # This is a new object, so set _old_lead to None
-#         instance._old_lead = None
-#
-#
-# @receiver(post_save, sender=T02Led10)
-# def update_salesman_stats_on_lead_save(sender, instance, created, **kwargs):
-#     print("Firing...")
-#
-#     if not instance.assigned_to:
-#         print("No salesman assigned. Exiting signal.")
-#         return
-#
-#         # Check if assigned_to has actually changed
-#     if not created and instance._old_lead and instance.assigned_to == instance._old_lead.assigned_to:
-#         print("Assigned to has not changed. Exiting signal.")
-#         return
-#
-#     with transaction.atomic():
-#         stats, created_stats = SalesmanStats.objects.select_for_update().get_or_create(salesman=instance.assigned_to)
-#         print(f"SalesmanStats object {'created' if created_stats else 'fetched'} for salesman {instance.assigned_to}")
-#
-#         if created:
-#             stats.total_leads = F('total_leads') + 1
-#             print("Incremented total_leads.")
-#         else:
-#             print("This is an update operation.")
-#             old_salesman = instance._old_lead.assigned_to if instance._old_lead else None
-#
-#             if old_salesman and old_salesman != instance.assigned_to:
-#                 old_stats, _ = SalesmanStats.objects.get_or_create(salesman=old_salesman)
-#                 old_stats.total_leads = F('total_leads') - 1
-#                 old_stats.save(update_fields=['total_leads'])
-#                 print(f"SalesmanStats total_leads decremented for old salesman {old_salesman}")
-#
-#             old_status = instance._old_lead.lead_status.status if instance._old_lead and instance._old_lead.lead_status else None
-#             new_status = instance.lead_status.status if instance.lead_status else None
-#
-#             if old_status != new_status:
-#                 if old_status == "Closed Won":
-#                     stats.won_leads = F('won_leads') - 1
-#                 elif old_status == "Closed Lost":
-#                     stats.lost_leads = F('lost_leads') - 1
-#                 if new_status == "Closed Won":
-#                     stats.won_leads = F('won_leads') + 1
-#                 elif new_status == "Closed Lost":
-#                     stats.lost_leads = F('lost_leads') + 1
-#
-#         stats.save(update_fields=['total_leads', 'won_leads', 'lost_leads'])
-#         print("SalesmanStats saved successfully.")
-#
-#     # Outside the atomic block to ensure the transaction is committed
-#     stats.refresh_from_db()
-#     print("Debug: Re-fetched SalesmanStats:", stats)
-#
-#
-# @receiver(post_delete, sender=T02Led10)
-# def update_salesman_stats_on_lead_delete(sender, instance, **kwargs):
-#     print("Firing...")
-#     try:
-#         stats = SalesmanStats.objects.get(salesman=instance.assigned_to)
-#         stats.total_leads -= 1
-#
-#         if instance.lead_status.status == "Closed Won":
-#             stats.won_leads -= 1
-#         elif instance.lead_status.status == "Closed Lost":
-#             stats.lost_leads -= 1
-#
-#         stats.save()
-#     except Exception as e:
-#         # log the error or handle it as per your requirements
-#         print(f"Error in update_salesman_stats_on_lead_delete: {str(e)}")
-#
-#
-# @receiver(post_save, sender=T02Tsk10)
-# def update_salesman_stats_on_task_save(sender, instance, created, **kwargs):
-#     print("Firing...")
-#     try:
-#         if instance.lead and instance.lead.assigned_to:
-#             stats = SalesmanStats.objects.get(salesman=instance.lead.assigned_to)
-#
-#             if created:
-#                 stats.total_tasks += 1
-#
-#             # Update task stats based on status
-#             if instance.status == "Completed":
-#                 stats.closed_tasks += 1
-#             elif instance.due_date < timezone.now():
-#                 stats.overdue_tasks += 1
-#             else:
-#                 stats.in_progress_tasks += 1
-#
-#             stats.save()
-#     except Exception as e:
-#         # log the error or handle it as per your requirements
-#         print(f"Error in update_salesman_stats_on_task_save: {str(e)}")
-#
-#
-# @receiver(post_delete, sender=T02Tsk10)
-# def update_salesman_stats_on_task_delete(sender, instance, **kwargs):
-#     print("Firing...")
-#     try:
-#         if instance.lead and instance.lead.assigned_to:
-#             stats = SalesmanStats.objects.get(salesman=instance.lead.assigned_to)
-#             stats.total_tasks -= 1
-#
-#             # Update task stats based on status
-#             if instance.status == "Completed":
-#                 stats.closed_tasks -= 1
-#             elif instance.due_date < timezone.now():
-#                 stats.overdue_tasks -= 1
-#             else:
-#                 stats.in_progress_tasks -= 1
-#
-#             stats.save()
-#     except Exception as e:
-#         # log the error or handle it as per your requirements
-#         print(f"Error in update_salesman_stats_on_task_delete: {str(e)}")
-#
-#
-# @receiver(pre_save, sender=T02Tsk10)
-# def pre_save_task(sender, instance, **kwargs):
-#     # If the task is being updated (not created)
-#     print("Firing...")
-#     if instance.pk:
-#         # Fetch the old state of the task from the database
-#         old_task = T02Tsk10.objects.get(pk=instance.pk)
-#
-#         # Store the old state in the instance to be accessed in the post_save signal
-#         instance._old_status = old_task.status
-#         instance._old_due_date = old_task.due_date
-#         instance._old_salesman = old_task.lead.assigned_to if old_task.lead else None
 
 class LeadRotationMaster(models.Model):
     STATUS_CHOICES = (
@@ -1179,6 +1024,7 @@ class VideoCall(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     secondary_email = models.EmailField(blank=True, null=True)
     call_notes = models.TextField(blank=True, null=True)
+    history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
         if not self.link:
@@ -1214,6 +1060,7 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
     read_at = models.DateTimeField(null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"Notification from {self.sender.username} to {self.recipient.first_name} {self.recipient.last_name}"
@@ -1248,6 +1095,7 @@ class EchoData(models.Model):
     data = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     migrated = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"EchoData {self.id} created at {self.created_at}"
@@ -1266,6 +1114,7 @@ class PopNotification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     task = models.ForeignKey(T02Tsk10, on_delete=models.CASCADE, related_name='popnotifications_task', null=True,
                              blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ['-created_at']
@@ -1283,6 +1132,7 @@ class LeadHistoryModel(models.Model):
     new = models.JSONField(blank=True, null=True)
     by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     deleted_lead_id = models.TextField(blank=True, null=True)
+    history = HistoricalRecords()
 
 
 class DealHistoryModel(models.Model):
@@ -1294,6 +1144,7 @@ class DealHistoryModel(models.Model):
     new = models.JSONField(blank=True, null=True)
     by = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     deleted_deal_id = models.TextField(blank=True, null=True)
+    history = HistoricalRecords()
 
 
 class LeadAssignedReportModel(models.Model):
@@ -1302,3 +1153,4 @@ class LeadAssignedReportModel(models.Model):
     assigned_manually = models.BooleanField(null=True, blank=True)
     assigned_to = models.ForeignKey(T01Slm10, on_delete=models.CASCADE, blank=True, null=True)
     timestamp = models.DateTimeField(null=True, blank=True)
+    history = HistoricalRecords()
